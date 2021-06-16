@@ -5,13 +5,14 @@ using UnityEngine.UI;
 
 public class Gun : MonoBehaviour
 {
-    public float damage = 10f;
-    public float range = 100f;
-    float fireRate = 0.15f;
+     float damage = 10f;
+    float range = 100f;
+    float fireRate = 0.25f;
 
     public Camera fpscam;
     public ParticleSystem flash;
     public Image damageImage;
+    public Text healthText;
 
     string fire;
     private float r, g, b, a;
@@ -56,6 +57,9 @@ public class Gun : MonoBehaviour
             {
                 target.TakeDamage(damage);
                 a += 0.5f;
+                float health = Int64.Parse(healthText.text);
+                health -= damage;
+                healthText.text = ""+health;
             }
         }
     }

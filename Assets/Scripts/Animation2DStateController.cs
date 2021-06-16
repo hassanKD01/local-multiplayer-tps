@@ -8,7 +8,7 @@ public class Animation2DStateController : MonoBehaviour
     public CharacterController controller;
     public Transform groundCheck;
     public LayerMask groundMask;
-    public float health = 150f;
+     float health = 100f;
 
     float velocityX = 0.0f;
     float velocityZ = 0.0f;
