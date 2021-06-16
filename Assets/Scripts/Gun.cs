@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ public class Gun : MonoBehaviour
     public Camera fpscam;
     public ParticleSystem flash;
     public Image damageImage;
-    public Text healthText;
+    public TextMeshProUGUI healthText;
 
     string fire;
     private float r, g, b, a;
