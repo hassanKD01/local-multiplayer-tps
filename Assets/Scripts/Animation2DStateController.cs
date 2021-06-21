@@ -1,15 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Animation2DStateController : MonoBehaviour
 {
     public Animator animator;
     public CharacterController controller;
     public Transform groundCheck;
+    public GameObject gameOverPanel;
     public LayerMask groundMask;
-     float health = 100f;
+    public TextMeshProUGUI winnerTMPro;
+    public static bool gameOver = false;
 
+    float health = 100f;
     float velocityX = 0.0f;
     float velocityZ = 0.0f;
 
@@ -29,6 +34,7 @@ public class Animation2DStateController : MonoBehaviour
     int velocityZHash;
     int velocityXHash;
     string verticalAxis, horizontalAxis;
+    string winner;
     KeyCode shift, jump;
 
 
@@ -36,11 +42,12 @@ public class Animation2DStateController : MonoBehaviour
     {
         velocityZHash = Animator.StringToHash("velocityZ");
         velocityXHash = Animator.StringToHash("velocityX");
-        if (gameObject.name.Equals("fps1"))
+
+        if (gameObject.name.Equals("tps1"))
         {
-            verticalAxis = "Vertical"; horizontalAxis = "Horizontal"; shift = KeyCode.RightShift; jump = KeyCode.Space;
+            winner = "Player 2 Wins"; verticalAxis = "Vertical"; horizontalAxis = "Horizontal"; shift = KeyCode.RightShift; jump = KeyCode.Space;
         }
-        else { verticalAxis = "Vertical2"; horizontalAxis = "Horizontal2"; shift = KeyCode.LeftShift; jump = KeyCode.Tab; }
+        else { winner = "Player 1 Wins"; verticalAxis = "Vertical2"; horizontalAxis = "Horizontal2"; shift = KeyCode.LeftShift; jump = KeyCode.Tab; }
     }
 
     void changeVelocity(float vertical, float horizontal, bool rShiftPressed, float currentMaxVelocity)
@@ -160,35 +167,50 @@ public class Animation2DStateController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool rShiftPressed = Input.GetKey(shift);
-        float h = Input.GetAxis(horizontalAxis);
-        float v = Input.GetAxis(verticalAxis);
-
-        float currentMaxVelocity = rShiftPressed ? maxRunVelocity : maxWalkVelocity;
-
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        if (isGrounded && velocity.y < 0)
+        if (gameOver)
         {
-            velocity.y = -2f;
+            if (Input.GetKey(KeyCode.Return))
+            {
+                Cursor.lockState = CursorLockMode.None;
+                SceneManager.LoadScene(0);
+            }
         }
-        if (rShiftPressed) speed = 4f;
-        else speed = 2f;
+        else
+        {
 
-        changeVelocity(v, h, rShiftPressed, currentMaxVelocity);
-        lockOrResetVelocity(v, h, rShiftPressed, currentMaxVelocity);
+            if (health == 0f) { GameOver(); return; }
 
-        animator.SetFloat(velocityZHash, velocityZ);
-        animator.SetFloat(velocityXHash, velocityX);
-        Vector3 pos = transform.right * h + transform.forward * v;
+            bool rShiftPressed = Input.GetKey(shift);
+            float h = Input.GetAxis(horizontalAxis);
+            float v = Input.GetAxis(verticalAxis);
 
-        controller.Move(pos * speed * Time.deltaTime);
+            float currentMaxVelocity = rShiftPressed ? maxRunVelocity : maxWalkVelocity;
 
-        if (Input.GetKeyDown(jump) && isGrounded)
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+            if (isGrounded && velocity.y < 0)
+            {
+                velocity.y = -2f;
+            }
+            if (rShiftPressed) speed = 4f;
+            else speed = 2f;
+
+            changeVelocity(v, h, rShiftPressed, currentMaxVelocity);
+            lockOrResetVelocity(v, h, rShiftPressed, currentMaxVelocity);
+
+            animator.SetFloat(velocityZHash, velocityZ);
+            animator.SetFloat(velocityXHash, velocityX);
+            Vector3 pos = transform.right * h + transform.forward * v;
+
+            controller.Move(pos * speed * Time.deltaTime);
+
+            if (Input.GetKeyDown(jump) && isGrounded)
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+            velocity.y += gravity * Time.deltaTime;
+            controller.Move(velocity * Time.deltaTime);
+        }
+        
     }
 
     public void TakeDamage(float amount)
@@ -198,5 +220,13 @@ public class Animation2DStateController : MonoBehaviour
         {
             animator.SetBool("isDead", true);
         }
+    }
+
+    void GameOver()
+    {
+        gameOverPanel.SetActive(true);
+        Time.timeScale = 0f;
+        gameOver = true;
+        winnerTMPro.SetText(winner);
     }
 }
