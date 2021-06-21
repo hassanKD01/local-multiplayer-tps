@@ -47,6 +47,10 @@ public class Gun : MonoBehaviour
     
     public void Shoot()
     {
+        if (Animation2DStateController.gameOver || PauseMenu.isPaused)
+        {
+            return;
+        }
         flash.Play();
         AudioSource audio = GetComponent<AudioSource>();
         audio.Play();
