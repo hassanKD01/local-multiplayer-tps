@@ -178,8 +178,6 @@ public class Animation2DStateController : MonoBehaviour
         else
         {
 
-            if (health == 0f) { GameOver(); return; }
-
             bool rShiftPressed = Input.GetKey(shift);
             float h = Input.GetAxis(horizontalAxis);
             float v = Input.GetAxis(verticalAxis);
@@ -219,6 +217,7 @@ public class Animation2DStateController : MonoBehaviour
         if(health <= 0)
         {
             animator.SetBool("isDead", true);
+            GameOver();
         }
     }
 
